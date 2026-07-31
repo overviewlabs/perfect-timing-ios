@@ -74,6 +74,26 @@ jobs:
             -archivePath "$RUNNER_TEMP/PerfectTiming.xcarchive" \
             -exportPath "$RUNNER_TEMP/export" \
             -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist"
+      - name: Validate exported IPA metadata
+        run: |
+          set -euo pipefail
+          INSPECT_DIR="$RUNNER_TEMP/ipa-inspection"
+          unzip -q "$RUNNER_TEMP/export/Perfect Timing.ipa" -d "$INSPECT_DIR"
+          APP_PATH=$(find "$INSPECT_DIR/Payload" -maxdepth 1 -type d -name '*.app' -print -quit)
+          test -n "$APP_PATH"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIconName' "$APP_PATH/Info.plist")" = 'AppIcon'
+          test "$(/usr/libexec/PlistBuddy -c 'Print :UIDeviceFamily:0' "$APP_PATH/Info.plist")" = '1'
+          test "$(/usr/libexec/PlistBuddy -c 'Print :UIDeviceFamily' "$APP_PATH/Info.plist" | grep -c '^[[:space:]]*[0-9]')" = '1'
+          FOUND_ICON=false
+          while IFS= read -r icon; do
+            width=$(sips -g pixelWidth "$icon" | awk '/pixelWidth:/ {print $2}')
+            height=$(sips -g pixelHeight "$icon" | awk '/pixelHeight:/ {print $2}')
+            if [ "$width" = '120' ] && [ "$height" = '120' ]; then
+              FOUND_ICON=true
+              break
+            fi
+          done < <(find "$APP_PATH" -maxdepth 1 -type f -name '*.png')
+          test "$FOUND_ICON" = true
       - name: Upload to App Store Connect
         env:
           ASC_KEY_ID: ${{ secrets.APPSTORE_CONNECT_API_KEY_ID }}

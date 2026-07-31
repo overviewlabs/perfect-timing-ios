@@ -29,10 +29,6 @@
     <key>UIImageName</key>
     <string>LaunchLogo</string>
   </dict>
-  <key>UIRequiredDeviceCapabilities</key>
-  <array>
-    <string>armv8</string>
-  </array>
   <key>UISupportedInterfaceOrientations</key>
   <array>
     <string>UIInterfaceOrientationPortrait</string>

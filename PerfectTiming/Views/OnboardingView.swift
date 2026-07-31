@@ -12,6 +12,7 @@ struct OnboardingView: View {
       VStack(spacing: 28) {
         Spacer()
         TargetLogo()
+        Text("Perfect Timing").font(.largeTitle.weight(.black))
         Text(headline).font(.title.bold()).multilineTextAlignment(.center)
         if page == 0 {
           timingDemo

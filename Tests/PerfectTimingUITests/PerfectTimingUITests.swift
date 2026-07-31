@@ -23,13 +23,16 @@ final class PerfectTimingUITests: XCTestCase {
   }
   func testShopInventorySettingsRestore() {
     let app = launch(onboarded: true)
+    XCTAssertTrue(app.buttons["Shop"].waitForExistence(timeout: 5))
     app.buttons["Shop"].tap()
-    XCTAssertTrue(app.navigationBars["Shop"].exists)
+    XCTAssertTrue(app.navigationBars["Shop"].waitForExistence(timeout: 5))
     app.navigationBars.buttons.firstMatch.tap()
+    XCTAssertTrue(app.buttons["Inventory"].waitForExistence(timeout: 5))
     app.buttons["Inventory"].tap()
-    XCTAssertTrue(app.navigationBars["Inventory"].exists)
+    XCTAssertTrue(app.navigationBars["Inventory"].waitForExistence(timeout: 5))
     app.navigationBars.buttons.firstMatch.tap()
+    XCTAssertTrue(app.buttons["Settings"].waitForExistence(timeout: 5))
     app.buttons["Settings"].tap()
-    XCTAssertTrue(app.buttons["Restore Purchases"].exists)
+    XCTAssertTrue(app.buttons["Restore Purchases"].waitForExistence(timeout: 5))
   }
 }

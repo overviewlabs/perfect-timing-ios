@@ -65,10 +65,18 @@ final class AppCoordinator: ObservableObject {
 
   private func applyLaunchArguments() {
     let arguments = ProcessInfo.processInfo.arguments
-    if arguments.contains("--uitesting") {
+    let isUITesting =
+      arguments.contains("--uitesting")
+      || arguments.contains("-uiTestOnboarded")
+      || arguments.contains("-uiTestFirstLaunch")
+    if isUITesting {
       save = PlayerSaveData(achievements: AchievementManager.defaults)
-      if arguments.contains("--skip-onboarding") { save.onboardingComplete = true }
-      if arguments.contains("--reset-onboarding") { save.onboardingComplete = false }
+      if arguments.contains("--skip-onboarding") || arguments.contains("-uiTestOnboarded") {
+        save.onboardingComplete = true
+      }
+      if arguments.contains("--reset-onboarding") || arguments.contains("-uiTestFirstLaunch") {
+        save.onboardingComplete = false
+      }
     }
   }
 

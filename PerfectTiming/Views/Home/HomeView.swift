@@ -51,7 +51,12 @@ struct HomeView: View {
       }
     }.toolbar(.hidden, for: .navigationBar)
       .task {
-        guard !checkedDailyReward, !ProcessInfo.processInfo.arguments.contains("--uitesting") else {
+        let arguments = ProcessInfo.processInfo.arguments
+        let isUITesting =
+          arguments.contains("--uitesting")
+          || arguments.contains("-uiTestOnboarded")
+          || arguments.contains("-uiTestFirstLaunch")
+        guard !checkedDailyReward, !isUITesting else {
           return
         }
         checkedDailyReward = true

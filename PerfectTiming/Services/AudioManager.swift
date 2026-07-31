@@ -65,12 +65,12 @@ enum SoundCue {
   }
   func play(_ rating: AccuracyRating) {
     switch rating {
-    case .perfect: play(.perfect)
-    case .excellent: play(.excellent)
-    case .great: play(.great)
-    case .good: play(.good)
-    case .close: play(.close)
-    case .miss: play(.miss)
+    case .perfect: play(SoundCue.perfect)
+    case .excellent: play(SoundCue.excellent)
+    case .great: play(SoundCue.great)
+    case .good: play(SoundCue.good)
+    case .close: play(SoundCue.close)
+    case .miss: play(SoundCue.miss)
     }
   }
   private func tone(hz: Double, duration: Double) {
@@ -83,7 +83,7 @@ enum SoundCue {
     b.frameLength = count
     for i in 0..<Int(count) {
       let envelope = Float(1 - Double(i) / Double(count))
-      samples[i] = sin(Float(Double(i) * 2*.pi * hz / rate)) * envelope * 0.22 * volume
+      samples[i] = sin(Float(Double(i) * 2 * .pi * hz / rate)) * envelope * 0.22 * volume
     }
     player.scheduleBuffer(b)
     if !player.isPlaying { player.play() }

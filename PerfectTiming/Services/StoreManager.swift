@@ -12,7 +12,7 @@ import SwiftUI
   @Published private(set) var lastVerifiedTransactionID: UInt64?
   private var listener: Task<Void, Never>?
   private var entitlementHandler: ((Set<String>) -> Void)?
-  deinit { listener?.cancel() }
+  isolated deinit { listener?.cancel() }
   func start(onEntitlements: @escaping (Set<String>) -> Void) async {
     entitlementHandler = onEntitlements
     listener = observeTransactions()

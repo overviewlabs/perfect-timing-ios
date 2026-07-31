@@ -1,3 +1,4 @@
+import Combine
 import CoreGraphics
 import Foundation
 import PerfectTimingCore
@@ -72,7 +73,7 @@ final class GameSession: ObservableObject {
     countdown()
   }
 
-  deinit {
+  isolated deinit {
     timer?.invalidate()
     countdownTask?.cancel()
   }
@@ -265,12 +266,9 @@ final class GameSession: ObservableObject {
   private func startTimer() {
     timer?.invalidate()
     guard mode == .rush else { return }
-    timer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] timer in
-      Task { @MainActor in
-        guard let self, self.state == .playing else {
-          timer.invalidate()
-          return
-        }
+    timer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
+      Task { @MainActor [weak self] in
+        guard let self, self.state == .playing else { return }
         self.timeRemaining = max(0, self.timeRemaining - 0.05)
         if self.timeRemaining <= 0 { self.endRun() }
       }

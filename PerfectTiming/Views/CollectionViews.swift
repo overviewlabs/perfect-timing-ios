@@ -147,6 +147,7 @@ private struct PurchaseStatusView: View {
   let state: StoreManager.PurchaseState
   @ViewBuilder var body: some View {
     switch state {
+    case .loading: ProgressView("Loading purchases…")
     case .purchasing: ProgressView("Processing purchase…")
     case .pending: Label("Purchase pending approval", systemImage: "clock")
     case .failed(let message):

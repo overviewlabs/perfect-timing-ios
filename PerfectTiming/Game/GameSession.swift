@@ -1,5 +1,7 @@
+import CoreGraphics
 import Foundation
 import PerfectTimingCore
+import SwiftUI
 
 struct RunResult: Sendable {
   let mode: GameMode
@@ -10,35 +12,47 @@ struct RunResult: Sendable {
   let xp: Int
   let duration: TimeInterval
   let totalTaps: Int
+  let revivesUsed: Int
   let competitive: Bool
 }
 
-@MainActor final class GameSession: ObservableObject {
+@MainActor
+final class GameSession: ObservableObject {
   enum State { case countdown, playing, paused, reviveOffer, gameOver }
+
   @Published var state: State = .countdown
   @Published var score = 0
   @Published var round = 1
   @Published var combo = ComboManager()
   @Published var lives = 1
-  @Published var timeRemaining: TimeInterval = 60
+  @Published var timeRemaining: TimeInterval = GameConfiguration.rushDuration
   @Published var lastRating: AccuracyRating?
   @Published var lastPoints = 0
-  @Published var showGameOver = false
+  @Published private(set) var highestCombo = 0
+
   let mode: GameMode
   let audio: AudioManager
   let haptics: HapticManager
   let ads: any AdService
   let practiceDifficulty: DifficultyBand?
+  let settings: AppSettings
+  let competitive: Bool
   var onFinish: ((RunResult) -> Void)?
   private(set) var challenge: AnyTimingChallenge
+  private(set) var freeRevivesAvailable: Int
+
   private var ratings: [AccuracyRating: Int] = [:]
   private var started = Date()
-  private var highestCombo = 0
   private var revive = ReviveState()
   private var timer: Timer?
+  private var countdownTask: Task<Void, Never>?
   private var inputLocked = true
+  private var resultCommitted = false
+  private var revivesUsed = 0
+
   init(
-    mode: GameMode, save: PlayerSaveData, practiceDifficulty: DifficultyBand?, audio: AudioManager,
+    mode: GameMode, save: PlayerSaveData, practiceDifficulty: DifficultyBand? = nil,
+    competitive: Bool = true, audio: AudioManager,
     haptics: HapticManager, ads: any AdService
   ) {
     self.mode = mode
@@ -46,49 +60,86 @@ struct RunResult: Sendable {
     self.haptics = haptics
     self.ads = ads
     self.practiceDifficulty = practiceDifficulty
-    self.lives = mode == .precision ? GameConfiguration.precisionLives : 1
-    self.timeRemaining = mode == .rush ? GameConfiguration.rushDuration : 0
-    self.challenge = ChallengeFactory.make(
+    self.competitive = competitive && mode != .practice
+    settings = save.settings
+    freeRevivesAvailable = save.profile.freeRevives
+    lives = mode == .precision ? GameConfiguration.precisionLives : 1
+    timeRemaining = mode == .rush ? GameConfiguration.rushDuration : 0
+    challenge = ChallengeFactory.make(
       type: .movingBar,
-      difficulty: DifficultyManager.snapshot(score: 0, combo: 0, seconds: 0, failures: 0), seed: 1)
+      difficulty: DifficultyManager.snapshot(score: 0, combo: 0, seconds: 0, failures: 0),
+      seed: mode == .daily ? DailyChallengeManager.seed(for: Date()) : 1)
     countdown()
   }
+
+  deinit {
+    timer?.invalidate()
+    countdownTask?.cancel()
+  }
+
+  var canUseFreeRevive: Bool { !revive.used && freeRevivesAvailable > 0 }
+  var canUseRewardedRevive: Bool { !revive.used && ads.rewardedAvailable }
+  var rewardCoins: Int { competitive ? max(10, score / 350) : 0 }
+  var rewardXP: Int { competitive ? max(20, round * 8) : 0 }
+
   func countdown() {
+    countdownTask?.cancel()
     state = .countdown
     inputLocked = true
     audio.play(.countdown)
-    Task {
+    countdownTask = Task { @MainActor [weak self] in
       try? await Task.sleep(for: .seconds(1))
-      guard !Task.isCancelled else { return }
-      state = .playing
-      inputLocked = false
-      startTimer()
+      guard let self, !Task.isCancelled else { return }
+      self.state = .playing
+      self.inputLocked = false
+      self.startTimer()
     }
   }
+
   func tap(progress: Double, locationNormalized: CGPoint) {
     guard state == .playing, !inputLocked else { return }
     inputLocked = true
     let distance = challenge.normalizedDistance(at: progress)
-    let rating = TimingAccuracyEvaluator().rating(for: distance)
-    let difficulty = DifficultyManager.snapshot(
-      score: score, combo: combo.count, seconds: Date().timeIntervalSince(started), failures: 0)
+    register(TimingAccuracyEvaluator().rating(for: distance))
+  }
+
+  func expireChallenge() {
+    guard state == .playing, !inputLocked else { return }
+    inputLocked = true
+    register(.miss)
+  }
+
+  private func register(_ rating: AccuracyRating) {
+    let difficulty = currentDifficulty
     let points = ScoreManager.points(
-      rating: rating, combo: combo.count, difficulty: 1 + Double(difficulty.band.rawValue) * 0.12,
-      speed: max(1, difficulty.speed), mode: mode, round: round, perfectStreak: combo.perfectStreak)
+      rating: rating, combo: combo.count,
+      difficulty: 1 + Double(difficulty.band.rawValue) * 0.12,
+      speed: max(1, difficulty.speed), mode: mode, round: round,
+      perfectStreak: combo.perfectStreak)
     lastRating = rating
     lastPoints = points
     ratings[rating, default: 0] += 1
     score += points
     combo.register(rating)
     highestCombo = max(highestCombo, combo.count)
-    audio.play(rating)
-    haptics.play(rating)
+    if [5, 10, 20, 35, 50].contains(combo.count) {
+      audio.play(.milestone)
+      haptics.reward()
+    } else {
+      audio.play(rating)
+      haptics.play(rating)
+    }
+
     if mode == .rush {
       if rating == .perfect { timeRemaining += GameConfiguration.perfectBonusTime }
       if rating == .miss {
         timeRemaining = max(0, timeRemaining - GameConfiguration.missTimePenalty)
       }
+      round += 1
+      if timeRemaining <= 0 { endRun() } else { nextChallenge(after: rating) }
+      return
     }
+
     if rating == .miss {
       handleMiss()
     } else {
@@ -96,20 +147,37 @@ struct RunResult: Sendable {
       nextChallenge(after: rating)
     }
   }
-  private func nextChallenge(after rating: AccuracyRating) {
-    let d = DifficultyManager.snapshot(
+
+  private var currentDifficulty: DifficultySnapshot {
+    if let practiceDifficulty {
+      let baseline = DifficultyManager.snapshot(
+        score: practiceDifficulty.rawValue * 8_000, combo: practiceDifficulty.rawValue * 10,
+        seconds: Double(practiceDifficulty.rawValue * 35), failures: 0)
+      return DifficultySnapshot(
+        band: practiceDifficulty, speed: baseline.speed, acceleration: baseline.acceleration,
+        targetScale: baseline.targetScale, duration: baseline.duration,
+        targetMovement: baseline.targetMovement,
+        directionChangeChance: baseline.directionChangeChance, objectCount: baseline.objectCount,
+        fakeTargets: baseline.fakeTargets, distractionIntensity: baseline.distractionIntensity)
+    }
+    return DifficultyManager.snapshot(
       score: score, combo: combo.count, seconds: Date().timeIntervalSince(started), failures: 0)
+  }
+
+  private func nextChallenge(after rating: AccuracyRating) {
     var types = ChallengeType.allCases
     if round <= 5 { types = [.movingBar, .verticalDrop, .expandingRing, .rotatingNeedle] }
-    if mode == .chaos { types = ChallengeType.allCases }
-    let seed = UInt64(abs(score &+ round &* 7919))
+    let seedBase =
+      mode == .daily ? DailyChallengeManager.seed(for: Date()) : UInt64(abs(score &+ round &* 7919))
+    let seed = seedBase &+ UInt64(round &* 3571)
     challenge = ChallengeFactory.make(
-      type: types[Int(seed % UInt64(types.count))], difficulty: d, seed: seed)
-    Task {
+      type: types[Int(seed % UInt64(types.count))], difficulty: currentDifficulty, seed: seed)
+    Task { @MainActor [weak self] in
       try? await Task.sleep(for: .milliseconds(rating == .perfect ? 260 : 140))
-      inputLocked = false
+      self?.inputLocked = false
     }
   }
+
   private func handleMiss() {
     if mode == .practice {
       round += 1
@@ -126,26 +194,40 @@ struct RunResult: Sendable {
     inputLocked = true
     timer?.invalidate()
   }
-  func canRevive() -> Bool {
-    revive.canRevive(hasFreeRevive: true, rewardedAdAvailable: ads.rewardedAvailable)
-  }
-  func useRevive() {
-    guard canRevive() else {
+
+  func canRevive() -> Bool { canUseFreeRevive || canUseRewardedRevive }
+
+  func useFreeRevive() {
+    guard canUseFreeRevive else {
       endRun()
       return
     }
+    freeRevivesAvailable -= 1
+    applyRevive()
+  }
+
+  func rewardedRevive() {
+    guard canUseRewardedRevive else {
+      endRun()
+      return
+    }
+    Task { @MainActor [weak self] in
+      guard let self else { return }
+      let earned = await self.ads.showRewarded(placement: "revive")
+      if earned { self.applyRevive() }
+    }
+  }
+
+  private func applyRevive() {
+    guard !revive.used else { return }
     revive.use()
+    revivesUsed += 1
     haptics.revive()
     audio.play(.revive)
     combo = ComboManager()
     countdown()
   }
-  func rewardedRevive() {
-    Task {
-      let earned = await ads.showRewarded(placement: "revive")
-      if earned { useRevive() }
-    }
-  }
+
   func declineRevive() { endRun() }
   func pause() {
     guard state == .playing else { return }
@@ -157,27 +239,36 @@ struct RunResult: Sendable {
     countdown()
   }
   func remainPausedAfterBackground() { if state == .playing { pause() } }
+
   func restart() {
+    completeIfNeeded()
     timer?.invalidate()
+    countdownTask?.cancel()
     score = 0
     round = 1
     combo = ComboManager()
     ratings = [:]
     highestCombo = 0
     revive = ReviveState()
+    revivesUsed = 0
+    resultCommitted = false
     started = Date()
-    lives = mode == .precision ? 3 : 1
-    timeRemaining = mode == .rush ? 60 : 0
+    lives = mode == .precision ? GameConfiguration.precisionLives : 1
+    timeRemaining = mode == .rush ? GameConfiguration.rushDuration : 0
+    challenge = ChallengeFactory.make(
+      type: .movingBar, difficulty: currentDifficulty,
+      seed: mode == .daily
+        ? DailyChallengeManager.seed(for: Date()) : UInt64(Date().timeIntervalSince1970))
     countdown()
   }
-  func quit() { finish() }
+
   private func startTimer() {
     timer?.invalidate()
     guard mode == .rush else { return }
-    timer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] t in
+    timer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] timer in
       Task { @MainActor in
         guard let self, self.state == .playing else {
-          t.invalidate()
+          timer.invalidate()
           return
         }
         self.timeRemaining = max(0, self.timeRemaining - 0.05)
@@ -185,18 +276,26 @@ struct RunResult: Sendable {
       }
     }
   }
+
   func endRun() {
+    guard state != .gameOver else { return }
     timer?.invalidate()
     state = .gameOver
-    showGameOver = true
+    inputLocked = true
     audio.play(.gameOver)
+    completeIfNeeded()
   }
-  func finish() {
-    let result = RunResult(
-      mode: mode, score: score, highestCombo: highestCombo, ratings: ratings,
-      coins: mode == .practice ? 0 : max(10, score / 350),
-      xp: mode == .practice ? 0 : max(20, round * 8), duration: Date().timeIntervalSince(started),
-      totalTaps: ratings.values.reduce(0, +), competitive: mode != .practice)
-    onFinish?(result)
+
+  func finish() { completeIfNeeded() }
+
+  private func completeIfNeeded() {
+    guard !resultCommitted else { return }
+    resultCommitted = true
+    onFinish?(
+      RunResult(
+        mode: mode, score: score, highestCombo: highestCombo, ratings: ratings,
+        coins: rewardCoins, xp: rewardXP,
+        duration: Date().timeIntervalSince(started), totalTaps: ratings.values.reduce(0, +),
+        revivesUsed: revivesUsed, competitive: competitive))
   }
 }

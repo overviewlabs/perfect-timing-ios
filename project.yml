@@ -23,7 +23,12 @@ targets:
   PerfectTiming:
     type: application
     platform: iOS
-    sources: [PerfectTiming]
+    sources:
+      - PerfectTiming/App
+      - PerfectTiming/Game
+      - PerfectTiming/Models
+      - PerfectTiming/Services
+      - PerfectTiming/Views
     resources:
       - PerfectTiming/Resources
     dependencies:
@@ -40,6 +45,7 @@ targets:
         SWIFT_STRICT_CONCURRENCY: complete
     scheme:
       testTargets: [PerfectTimingTests, PerfectTimingUITests]
+      storeKitConfiguration: PerfectTiming/Resources/PerfectTiming.storekit
   PerfectTimingTests:
     type: bundle.unit-test
     platform: iOS

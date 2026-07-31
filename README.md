@@ -32,7 +32,7 @@ See [Architecture](docs/ARCHITECTURE.md), [App Store metadata](docs/APP_STORE_ME
 
 ```text
 Perfect Timing/
-├── .github/workflows/ios-build.yml
+├── .github/workflows/{ios-build,testflight}.yml
 ├── PerfectTiming/
 │   ├── App/
 │   ├── Game/

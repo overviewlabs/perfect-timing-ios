@@ -9,6 +9,7 @@ import SpriteKit
   private let marker = SKShapeNode()
   private let dial = SKShapeNode()
   private var lastProgress = 0.0
+  private var challengeExpired = false
 
   convenience init(size: CGSize, session: GameSession) {
     self.init(size: size)
@@ -38,13 +39,20 @@ import SpriteKit
     if identifier != challengeID {
       challengeID = identifier
       originTime = currentTime
+      challengeExpired = false
       configure(challenge)
     }
     lastProgress = (currentTime - originTime) / max(0.2, challenge.timeLimit)
+    if lastProgress >= 1, !challengeExpired {
+      challengeExpired = true
+      session.expireChallenge()
+      return
+    }
     render(challenge, progress: lastProgress)
   }
   private func configure(_ challenge: AnyTimingChallenge) {
-    removeChildren(in: children.filter { $0.name == "effect" })
+    marker.fillColor = session?.settings.highContrast == true ? .yellow : .white
+    removeChildren(in: children.filter { $0.name == "effect" || $0.name == "challenge-extra" })
     target.path = nil
     marker.path = nil
     dial.path = nil
@@ -75,10 +83,27 @@ import SpriteKit
     }
     target.alpha = 0.95
     marker.alpha = 1
+    for index in 0..<challenge.fakeTargets {
+      let fake = target.copy() as! SKShapeNode
+      fake.name = "challenge-extra"
+      fake.strokeColor = UIColor.systemPink.withAlphaComponent(0.45)
+      fake.glowWidth = 5
+      fake.alpha = 0.55
+      fake.position = CGPoint(
+        x: size.width * (0.18 + 0.25 * CGFloat(index)),
+        y: size.height * (0.30 + 0.12 * CGFloat(index % 3)))
+      addChild(fake)
+    }
   }
   private func render(_ challenge: AnyTimingChallenge, progress: Double) {
     let position = challenge.position(at: progress)
     let center = CGPoint(x: size.width / 2, y: size.height * 0.48)
+    let motionScale = session?.settings.reduceMotion == true ? 0.0 : 1.0
+    let chaosPulse = sin(progress * Double.pi * 8) * challenge.distractionIntensity * motionScale
+    backgroundColor = UIColor(
+      red: 0.015 + 0.025 * CGFloat(max(0, chaosPulse)), green: 0.025,
+      blue: 0.07 + 0.05 * CGFloat(max(0, -chaosPulse)), alpha: 1)
+    target.zRotation = CGFloat(chaosPulse * 0.12)
     switch challenge.type {
     case .movingBar, .bouncingMarker:
       target.position = CGPoint(x: size.width * challenge.targetCenter, y: center.y)
@@ -128,13 +153,14 @@ import SpriteKit
       .sequence([
         .group([.scale(to: 3, duration: 0.24), .fadeOut(withDuration: 0.24)]), .removeFromParent(),
       ]))
-    for index in 0..<10 {
+    let particleCount = Int(12 * (session?.settings.particleIntensity ?? 1))
+    for index in 0..<particleCount {
       let dot = SKShapeNode(circleOfRadius: 3)
       dot.name = "effect"
       dot.fillColor = .cyan
       dot.position = point
       addChild(dot)
-      let angle = CGFloat(index) * .pi / 5
+      let angle = CGFloat(index) * .pi * 2 / CGFloat(max(1, particleCount))
       dot.run(
         .sequence([
           .group([

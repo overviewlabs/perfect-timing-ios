@@ -19,6 +19,7 @@ struct ModeSelectionView: View {
 struct ModeCard: View {
   @EnvironmentObject var app: AppCoordinator
   let mode: GameMode
+  @State private var practiceDifficulty: DifficultyBand = .normal
   var locked: Bool { mode == .chaos && app.save.profile.level < GameConfiguration.chaosUnlockLevel }
   var body: some View {
     NeonCard {
@@ -37,9 +38,18 @@ struct ModeCard: View {
           }
         }
         Spacer()
-        Button(locked ? "Locked" : "Play") { if !locked { app.start(mode) } }.buttonStyle(
-          .borderedProminent
-        ).disabled(locked)
+        VStack {
+          if mode == .practice {
+            Picker("Difficulty", selection: $practiceDifficulty) {
+              ForEach(DifficultyBand.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
+            }.labelsHidden()
+          }
+          Button(locked ? "Locked" : "Play") {
+            if !locked {
+              app.start(mode, practiceDifficulty: mode == .practice ? practiceDifficulty : nil)
+            }
+          }.buttonStyle(.borderedProminent).disabled(locked)
+        }
       }
     }
   }

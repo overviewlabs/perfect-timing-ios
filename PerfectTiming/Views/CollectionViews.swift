@@ -9,14 +9,49 @@ struct ShopView: View {
     ZStack {
       NeonBackground()
       ScrollView {
-        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
-          ForEach(CosmeticCatalog.all.filter { !$0.premium }) { item in
-            CosmeticTile(item: item, owned: app.save.inventory.owned.contains(item.id)).onTapGesture
-            { selected = item }
+        VStack(alignment: .leading, spacing: 18) {
+          PurchaseStatusView(state: app.store.state)
+          if !app.store.products.isEmpty {
+            Text("Store Packs").font(.title2.bold()).padding(.horizontal)
+            ForEach(app.store.products.filter { $0.id != StoreConfiguration.premium }) { product in
+              NeonCard {
+                HStack {
+                  VStack(alignment: .leading) {
+                    Text(product.displayName).font(.headline)
+                    Text(product.description).font(.caption).foregroundStyle(.secondary)
+                  }
+                  Spacer()
+                  Button(product.displayPrice) { Task { await purchase(product) } }
+                    .buttonStyle(.borderedProminent)
+                }
+              }.padding(.horizontal)
+            }
           }
-        }.padding()
+          Text("Cosmetics").font(.title2.bold()).padding(.horizontal)
+          LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
+            ForEach(CosmeticCatalog.all.filter { !$0.premium }) { item in
+              CosmeticTile(item: item, owned: app.save.inventory.owned.contains(item.id))
+                .onTapGesture {
+                  selected = item
+                }
+            }
+          }.padding(.horizontal)
+        }.padding(.vertical)
       }
     }.navigationTitle("Shop").sheet(item: $selected) { CosmeticPreviewView(item: $0) }
+  }
+
+  @MainActor private func purchase(_ product: Product) async {
+    guard await app.store.purchase(product) else { return }
+    if let amount = StoreConfiguration.coinAmounts[product.id],
+      let transactionID = app.store.lastVerifiedTransactionID
+    {
+      _ = app.save.economy.grant(
+        amount, reason: "Store coin pack", rewardID: "store-transaction-\(transactionID)")
+    }
+    app.applyPremiumUnlocksIfNeeded()
+    app.haptics.reward()
+    app.persist()
   }
 }
 struct InventoryView: View {
@@ -108,6 +143,19 @@ struct CosmeticPreviewView: View {
     }
   }
 }
+private struct PurchaseStatusView: View {
+  let state: StoreManager.PurchaseState
+  @ViewBuilder var body: some View {
+    switch state {
+    case .purchasing: ProgressView("Processing purchase…")
+    case .pending: Label("Purchase pending approval", systemImage: "clock")
+    case .failed(let message):
+      Label(message, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+    case .idle, .success: EmptyView()
+    }
+  }
+}
+
 struct PremiumView: View {
   @EnvironmentObject var app: AppCoordinator
   var body: some View {
@@ -149,6 +197,7 @@ struct PremiumView: View {
             ProgressView("Loading purchases…")
           }
           Button("Restore Purchases") { Task { await app.store.restore() } }.buttonStyle(.bordered)
+          PurchaseStatusView(state: app.store.state)
           Text("One-time purchase. Rewarded ads remain optional.").font(.footnote).foregroundStyle(
             .secondary)
         }.padding(24)

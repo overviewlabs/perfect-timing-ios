@@ -31,6 +31,9 @@ public enum StoreConfiguration {
   public static let productIDs: Set<String> = [
     premium, cosmeticBundle, smallCoins, mediumCoins, largeCoins,
   ]
+  public static let coinAmounts: [String: Int] = [
+    smallCoins: 1_000, mediumCoins: 3_500, largeCoins: 8_000,
+  ]
 }
 public enum AdConfiguration {
   public static let minimumRuns = 3

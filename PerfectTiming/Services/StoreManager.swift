@@ -1,5 +1,6 @@
 import PerfectTimingCore
 import StoreKit
+import SwiftUI
 
 @MainActor final class StoreManager: ObservableObject {
   enum PurchaseState: Equatable {
@@ -8,6 +9,7 @@ import StoreKit
   }
   @Published private(set) var products: [Product] = []
   @Published var state: PurchaseState = .idle
+  @Published private(set) var lastVerifiedTransactionID: UInt64?
   private var listener: Task<Void, Never>?
   private var entitlementHandler: ((Set<String>) -> Void)?
   deinit { listener?.cancel() }
@@ -32,6 +34,7 @@ import StoreKit
       switch try await product.purchase() {
       case .success(let verification):
         let transaction = try verified(verification)
+        lastVerifiedTransactionID = transaction.id
         await transaction.finish()
         state = .success
         await refreshEntitlements()

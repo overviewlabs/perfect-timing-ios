@@ -26,11 +26,12 @@ struct DailyChallengeView: View {
           app.save.dailyChallenge.officialAttemptUsed
             ? "Practice Today’s Seed" : "Start Official Attempt"
         ) {
-          if !app.save.dailyChallenge.officialAttemptUsed {
+          let official = !app.save.dailyChallenge.officialAttemptUsed
+          if official {
             app.save.dailyChallenge.officialAttemptUsed = true
             app.persist()
           }
-          app.start(.daily)
+          app.start(.daily, competitive: official)
         }.buttonStyle(PrimaryButtonStyle())
         Text("Seed \(DailyChallengeManager.seed(for:Date()))").font(.caption2).foregroundStyle(
           .secondary)
@@ -93,7 +94,15 @@ struct MissionsView: View {
           }
           Text(m.detail).font(.caption).foregroundStyle(.secondary)
           ProgressView(value: Double(m.progress), total: Double(m.target))
-          Text("\(m.progress)/\(m.target)").font(.caption2)
+          HStack {
+            Text("\(m.progress)/\(m.target)").font(.caption2)
+            Spacer()
+            if m.isComplete {
+              Button(m.claimed ? "Claimed" : "Claim") { app.claimMission(m.id) }
+                .buttonStyle(.borderedProminent)
+                .disabled(m.claimed)
+            }
+          }
         }
       }.scrollContentBackground(.hidden)
     }.navigationTitle("Missions")

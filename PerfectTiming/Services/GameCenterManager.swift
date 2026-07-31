@@ -1,5 +1,6 @@
 import GameKit
 import PerfectTimingCore
+import SwiftUI
 
 @MainActor final class GameCenterManager: ObservableObject {
   @Published private(set) var authenticated = false
@@ -47,7 +48,7 @@ import PerfectTimingCore
       .rootViewController?.present(vc, animated: true)
   }
 }
-final class GameCenterDismissDelegate: NSObject, GKGameCenterControllerDelegate {
+@MainActor final class GameCenterDismissDelegate: NSObject, GKGameCenterControllerDelegate {
   @MainActor static let shared = GameCenterDismissDelegate()
   func gameCenterViewControllerDidFinish(_ gameCenterViewController: GKGameCenterViewController) {
     gameCenterViewController.dismiss(animated: true)

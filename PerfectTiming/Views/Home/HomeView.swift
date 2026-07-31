@@ -3,6 +3,7 @@ import SwiftUI
 
 struct HomeView: View {
   @EnvironmentObject var app: AppCoordinator
+  @State private var checkedDailyReward = false
   var body: some View {
     ZStack {
       NeonBackground()
@@ -49,6 +50,18 @@ struct HomeView: View {
         }.padding(20)
       }
     }.toolbar(.hidden, for: .navigationBar)
+      .task {
+        guard !checkedDailyReward, !ProcessInfo.processInfo.arguments.contains("--uitesting") else {
+          return
+        }
+        checkedDailyReward = true
+        if let last = app.save.dailyReward.lastClaimDate,
+          Calendar.current.isDate(last, inSameDayAs: Date())
+        {
+          return
+        }
+        app.navigate(.reward)
+      }
   }
   private var levelProgress: Double {
     let level = app.save.profile.level

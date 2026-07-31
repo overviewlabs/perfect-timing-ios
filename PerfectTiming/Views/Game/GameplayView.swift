@@ -8,7 +8,7 @@ struct GameplayView: View {
   var body: some View {
     if let session = app.activeSession {
       GameContainer(session: session) {
-        session.finish()
+        app.closeActiveSession()
         dismiss()
       }
     } else {
@@ -118,8 +118,10 @@ private struct ReviveOverlay: View {
       VStack(spacing: 18) {
         Image(systemName: "bolt.heart.fill").font(.system(size: 65)).foregroundStyle(.cyan)
         Text("One more chance?").font(.largeTitle.black)
-        Button("Revive") { session.useRevive() }.buttonStyle(PrimaryButtonStyle())
-        if session.ads.rewardedAvailable {
+        if session.canUseFreeRevive {
+          Button("Use Free Revive") { session.useFreeRevive() }.buttonStyle(PrimaryButtonStyle())
+        }
+        if session.canUseRewardedRevive {
           Button("Watch to Revive") { session.rewardedRevive() }.buttonStyle(.borderedProminent)
         }
         Button("End Run") { session.declineRevive() }.foregroundStyle(.secondary)
@@ -137,10 +139,10 @@ private struct GameOverOverlay: View {
         VStack(spacing: 15) {
           Text("RUN COMPLETE").font(.caption.bold()).foregroundStyle(.cyan)
           Text(session.score.formatted()).font(.system(size: 54, weight: .black, design: .rounded))
-          Text("Best Combo \(session.combo.count)").foregroundStyle(.secondary)
+          Text("Best Combo \(session.highestCombo)").foregroundStyle(.secondary)
           HStack {
-            StatPill(icon: "circle.hexagongrid.fill", value: "+\(max(10, session.score / 350))")
-            StatPill(icon: "sparkles", value: "+\(max(20, session.round * 8)) XP")
+            StatPill(icon: "circle.hexagongrid.fill", value: "+\(session.rewardCoins)")
+            StatPill(icon: "sparkles", value: "+\(session.rewardXP) XP")
           }
           Button("PLAY AGAIN") { session.restart() }.buttonStyle(PrimaryButtonStyle())
           Button("Share Score") {

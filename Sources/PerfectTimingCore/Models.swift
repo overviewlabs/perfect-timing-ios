@@ -37,6 +37,22 @@ public struct DifficultySnapshot: Codable, Equatable, Sendable {
   public var objectCount: Int
   public var fakeTargets: Int
   public var distractionIntensity: Double
+  public init(
+    band: DifficultyBand, speed: Double, acceleration: Double, targetScale: Double,
+    duration: Double, targetMovement: Double, directionChangeChance: Double,
+    objectCount: Int, fakeTargets: Int, distractionIntensity: Double
+  ) {
+    self.band = band
+    self.speed = speed
+    self.acceleration = acceleration
+    self.targetScale = targetScale
+    self.duration = duration
+    self.targetMovement = targetMovement
+    self.directionChangeChance = directionChangeChance
+    self.objectCount = objectCount
+    self.fakeTargets = fakeTargets
+    self.distractionIntensity = distractionIntensity
+  }
 }
 
 public struct PlayerProfile: Codable, Equatable, Sendable {
@@ -245,6 +261,21 @@ public struct CosmeticItem: Codable, Hashable, Sendable, Identifiable {
   public let premium: Bool
   public let unlockLevel: Int
   public let previewHex: String
+  public init(
+    id: String, name: String, detail: String, category: CosmeticCategory,
+    rarity: CosmeticRarity, coinPrice: Int, premium: Bool, unlockLevel: Int,
+    previewHex: String
+  ) {
+    self.id = id
+    self.name = name
+    self.detail = detail
+    self.category = category
+    self.rarity = rarity
+    self.coinPrice = coinPrice
+    self.premium = premium
+    self.unlockLevel = unlockLevel
+    self.previewHex = previewHex
+  }
 }
 public struct CosmeticInventory: Codable, Equatable, Sendable {
   public var owned: Set<String> = ["theme.neonBlue", "marker.orb", "trail.spark"]

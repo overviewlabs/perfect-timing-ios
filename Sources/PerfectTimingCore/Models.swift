@@ -21,9 +21,19 @@ public enum AccuracyRating: String, Codable, CaseIterable, Sendable {
   case perfect, excellent, great, good, close, miss
 }
 
-public enum DifficultyBand: Int, Codable, CaseIterable, Comparable, Sendable {
+public enum DifficultyBand: Int, Codable, CaseIterable, Comparable, Hashable, Sendable {
   case beginner, easy, normal, hard, expert, insane
   public static func < (lhs: Self, rhs: Self) -> Bool { lhs.rawValue < rhs.rawValue }
+  public var title: String {
+    switch self {
+    case .beginner: "Beginner"
+    case .easy: "Easy"
+    case .normal: "Normal"
+    case .hard: "Hard"
+    case .expert: "Expert"
+    case .insane: "Insane"
+    }
+  }
 }
 
 public struct DifficultySnapshot: Codable, Equatable, Sendable {

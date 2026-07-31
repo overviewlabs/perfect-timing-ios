@@ -102,7 +102,7 @@ private struct PauseOverlay: View {
     Color.black.opacity(0.75).ignoresSafeArea().overlay {
       NeonCard {
         VStack(spacing: 16) {
-          Text("PAUSED").font(.largeTitle.black)
+          Text("PAUSED").font(.largeTitle.weight(.black))
           Button("Resume") { session.resume() }.buttonStyle(PrimaryButtonStyle())
           Button("Restart") { session.restart() }.buttonStyle(.bordered)
           Button("Quit to Menu", role: .destructive) { onExit() }.buttonStyle(.bordered)
@@ -117,7 +117,7 @@ private struct ReviveOverlay: View {
     Color.black.opacity(0.82).ignoresSafeArea().overlay {
       VStack(spacing: 18) {
         Image(systemName: "bolt.heart.fill").font(.system(size: 65)).foregroundStyle(.cyan)
-        Text("One more chance?").font(.largeTitle.black)
+        Text("One more chance?").font(.largeTitle.weight(.black))
         if session.canUseFreeRevive {
           Button("Use Free Revive") { session.useFreeRevive() }.buttonStyle(PrimaryButtonStyle())
         }
@@ -168,7 +168,7 @@ struct ShareCardItem: Identifiable {
         colors: [Color.black, Color.cyan.opacity(0.5)], startPoint: .top, endPoint: .bottom)
       VStack(spacing: 22) {
         TargetLogo()
-        Text("PERFECT TIMING").font(.title.black)
+        Text("PERFECT TIMING").font(.title.weight(.black))
         Text(score.formatted()).font(.system(size: 64, weight: .black))
         Text(
           "\(mode.rawValue.capitalized) • \(combo) Combo • \(accuracy.formatted(.percent.precision(.fractionLength(1))))"

@@ -11,15 +11,15 @@ struct DailyChallengeView: View {
       NeonBackground()
       VStack(spacing: 22) {
         Image(systemName: "calendar.badge.clock").font(.system(size: 72)).foregroundStyle(.cyan)
-        Text("Today’s Challenge").font(.largeTitle.black)
-        Text(mode.rawValue.capitalized).font(.title2.bold)
+        Text("Today’s Challenge").font(.largeTitle.weight(.black))
+        Text(mode.rawValue.capitalized).font(.title2.bold())
         Text("A deterministic challenge shared by every player today.").multilineTextAlignment(
           .center
         ).foregroundStyle(.secondary)
         NeonCard {
           VStack {
             Text("Local Best").font(.caption)
-            Text(app.save.dailyChallenge.bestScore.formatted()).font(.largeTitle.black)
+            Text(app.save.dailyChallenge.bestScore.formatted()).font(.largeTitle.weight(.black))
           }
         }
         Button(
@@ -46,7 +46,7 @@ struct DailyRewardView: View {
     ZStack {
       NeonBackground()
       VStack(spacing: 22) {
-        Text("Daily Rewards").font(.largeTitle.black)
+        Text("Daily Rewards").font(.largeTitle.weight(.black))
         HStack {
           ForEach(0..<7) { i in
             VStack {
@@ -181,7 +181,7 @@ struct LeaderboardsView: View {
       VStack(spacing: 22) {
         Image(systemName: "crown.fill").font(.system(size: 70)).foregroundStyle(.yellow)
         Text(app.gameCenter.authenticated ? "Game Center Connected" : "Game Center Offline").font(
-          .title.bold)
+          .title.bold())
         Text("Perfect Timing remains fully playable offline.").foregroundStyle(.secondary)
         Button("Open Game Center") { app.gameCenter.showDashboard() }.buttonStyle(
           PrimaryButtonStyle()
@@ -197,7 +197,7 @@ struct ProfileView: View {
       NeonBackground()
       VStack(spacing: 22) {
         Image(systemName: "person.crop.circle.fill").font(.system(size: 90)).foregroundStyle(.cyan)
-        Text("Level \(app.save.profile.level)").font(.largeTitle.black)
+        Text("Level \(app.save.profile.level)").font(.largeTitle.weight(.black))
         Text(app.save.profile.title).foregroundStyle(.secondary)
         NeonCard {
           VStack {

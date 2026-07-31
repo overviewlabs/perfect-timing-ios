@@ -79,7 +79,8 @@ struct NotificationExplanationView: View {
       NeonBackground()
       VStack(spacing: 24) {
         Image(systemName: "bell.badge.fill").font(.system(size: 72)).foregroundStyle(.cyan)
-        Text("A gentle timing reminder").font(.largeTitle.black).multilineTextAlignment(.center)
+        Text("A gentle timing reminder").font(.largeTitle.weight(.black)).multilineTextAlignment(
+          .center)
         Text(
           "Get an optional reminder for daily challenges and unclaimed rewards. You can turn this off anytime."
         ).multilineTextAlignment(.center).foregroundStyle(.secondary)

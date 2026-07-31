@@ -98,7 +98,7 @@ import SpriteKit
   private func render(_ challenge: AnyTimingChallenge, progress: Double) {
     let position = challenge.position(at: progress)
     let center = CGPoint(x: size.width / 2, y: size.height * 0.48)
-    let motionScale = session?.settings.reduceMotion == true ? 0.0 : 1.0
+    let motionScale = session?.settings.reducedMotion == true ? 0.0 : 1.0
     let chaosPulse = sin(progress * Double.pi * 8) * challenge.distractionIntensity * motionScale
     backgroundColor = UIColor(
       red: 0.015 + 0.025 * CGFloat(max(0, chaosPulse)), green: 0.025,

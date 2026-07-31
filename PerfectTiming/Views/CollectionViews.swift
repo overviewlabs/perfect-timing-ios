@@ -95,7 +95,7 @@ struct CosmeticTile: View {
           Image(systemName: owned ? "checkmark.circle.fill" : "sparkles").font(.title)
             .foregroundStyle(.white))
         Text(item.name).font(.headline).lineLimit(1)
-        Text(owned ? "Owned" : "◉ \(item.coinPrice)").font(.caption.bold).foregroundStyle(
+        Text(owned ? "Owned" : "◉ \(item.coinPrice)").font(.caption.bold()).foregroundStyle(
           owned ? .green : .cyan)
       }
     }
@@ -115,7 +115,7 @@ struct CosmeticPreviewView: View {
         RoundedRectangle(cornerRadius: 34).fill(Color(hex: item.previewHex).gradient).frame(
           height: 280
         ).overlay(TargetLogo())
-        Text(item.name).font(.largeTitle.black)
+        Text(item.name).font(.largeTitle.weight(.black))
         Text(item.detail).foregroundStyle(.secondary)
         Spacer()
         Button(owned ? "Equip" : "Unlock for \(item.coinPrice.formatted()) Coins") {
@@ -164,7 +164,8 @@ struct PremiumView: View {
       ScrollView {
         VStack(spacing: 22) {
           Image(systemName: "crown.fill").font(.system(size: 70)).foregroundStyle(.yellow)
-          Text("Perfect Timing Premium").font(.largeTitle.black).multilineTextAlignment(.center)
+          Text("Perfect Timing Premium").font(.largeTitle.weight(.black)).multilineTextAlignment(
+            .center)
           ForEach(
             [
               "No interstitial ads", "Void theme bundle", "Exclusive Apex marker",

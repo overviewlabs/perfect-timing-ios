@@ -56,7 +56,7 @@ struct OnboardingView: View {
       }.onAppear {
         withAnimation(.linear(duration: 1.3).repeatForever(autoreverses: true)) { marker = 130 }
       }
-      Text(feedback).font(.title2.black).foregroundStyle(.cyan)
+      Text(feedback).font(.title2.weight(.black)).foregroundStyle(.cyan)
     }
   }
 }

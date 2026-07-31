@@ -26,6 +26,7 @@ struct HomeView: View {
           }.foregroundStyle(.white)
           VStack(spacing: 5) {
             Text("DON’T").font(.system(size: 44, weight: .black, design: .rounded))
+              .foregroundStyle(.white)
             Text("TAP YET!").font(.system(size: 44, weight: .black, design: .rounded))
               .foregroundStyle(.cyan)
           }.padding(.vertical, 22)

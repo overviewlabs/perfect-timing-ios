@@ -54,7 +54,7 @@ struct LaunchView: View {
       NeonBackground()
       VStack(spacing: 22) {
         TargetLogo().scaleEffect(pulse ? 1.08 : 0.9)
-        Text("Don’t Tap Yet!").font(.largeTitle.weight(.black))
+        Text("Don’t Tap Yet!").font(.largeTitle.weight(.black)).foregroundStyle(.white)
         ProgressView().tint(.cyan)
       }.onAppear {
         withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) { pulse = true }

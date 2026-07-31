@@ -12,7 +12,7 @@ struct OnboardingView: View {
       VStack(spacing: 28) {
         Spacer()
         TargetLogo()
-        Text("Don’t Tap Yet!").font(.largeTitle.weight(.black))
+        Text("Don’t Tap Yet!").font(.largeTitle.weight(.black)).foregroundStyle(.white)
         Text(headline).font(.title.bold()).multilineTextAlignment(.center)
         if page == 0 {
           timingDemo

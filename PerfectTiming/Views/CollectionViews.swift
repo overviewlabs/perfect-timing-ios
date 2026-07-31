@@ -165,7 +165,7 @@ struct PremiumView: View {
       ScrollView {
         VStack(spacing: 22) {
           Image(systemName: "crown.fill").font(.system(size: 70)).foregroundStyle(.yellow)
-          Text("Perfect Timing Premium").font(.largeTitle.weight(.black)).multilineTextAlignment(
+          Text("Don’t Tap Yet! Premium").font(.largeTitle.weight(.black)).multilineTextAlignment(
             .center)
           ForEach(
             [

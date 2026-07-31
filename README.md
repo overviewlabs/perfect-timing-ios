@@ -1,4 +1,4 @@
-# Perfect Timing
+# Don’t Tap Yet!
 
 A polished one-touch timing game for iPhone, built with SwiftUI, SpriteKit, StoreKit 2, GameKit, AVFoundation, UIKit haptics, UserNotifications, Swift Charts, and a versioned Codable save system. The base game has no backend, login, analytics, tracking, or required network connection.
 
@@ -6,7 +6,7 @@ A polished one-touch timing game for iPhone, built with SwiftUI, SpriteKit, Stor
 
 | Setting | Value |
 |---|---|
-| Display name | Perfect Timing |
+| Display name | Don’t Tap Yet! |
 | Temporary bundle ID | `com.whox.perfecttiming` |
 | Deployment target | iOS 17+ |
 | Devices | iPhone only |

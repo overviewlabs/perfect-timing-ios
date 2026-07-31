@@ -9,7 +9,7 @@ final class PerfectTimingUITests: XCTestCase {
   }
   func testFirstLaunchAndOnboarding() {
     let app = launch()
-    XCTAssertTrue(app.staticTexts["Perfect Timing"].waitForExistence(timeout: 5))
+    XCTAssertTrue(app.staticTexts["Don’t Tap Yet!"].waitForExistence(timeout: 5))
     if app.buttons["Skip"].exists { app.buttons["Skip"].tap() }
   }
   func testStartClassicTapEndAndRestart() {

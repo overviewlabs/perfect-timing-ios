@@ -33,7 +33,7 @@ struct SettingsView: View {
         }
         Section("About") {
           Button("Privacy, Terms & Support") { app.navigate(.legal) }
-          Button("Rate Perfect Timing") { requestReview() }
+          Button("Rate Don’t Tap Yet!") { requestReview() }
           LabeledContent("Version", value: version)
         }
         Section("Progress") {

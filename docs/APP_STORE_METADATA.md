@@ -1,9 +1,9 @@
 # App Store Metadata Draft
 
-**Name:** Perfect Timing  
-**Subtitle:** Tap the moment. Chase perfection.  
-**Primary category:** Games — Casual  
-**Secondary category:** Games — Arcade  
+**Name:** Don’t Tap Yet!
+**Subtitle:** Wait for it. Tap to win.
+**Primary category:** Games — Casual
+**Secondary category:** Games — Arcade
 **Age rating guidance:** 9+; no violence, gambling, unrestricted web access, or user-generated content. Advertising content must remain age-appropriate.
 
 ## Promotional text
@@ -12,7 +12,7 @@ One tap. One perfect instant. Build huge combos, master daily challenges, and un
 
 ## Description
 
-Perfect Timing is a fast, satisfying one-touch timing game built around the most rewarding split second in mobile gaming.
+Don’t Tap Yet! is a fast, satisfying one-touch timing game built around the most rewarding split second in mobile gaming.
 
 Tap when the moving marker reaches its target. The closer you are, the bigger your score. Perfect hits build combos, trigger vivid effects, and push every run toward a new personal best.
 
@@ -31,7 +31,7 @@ Master moving bars, vertical drops, rotating needles, expanding and contracting 
 Earn Timing Coins through play and unlock themes, markers, trails, tap effects, particles, badges, and game-over styles. Cosmetic purchases never improve leaderboard performance.
 
 **Fair by design**
-Perfect Timing is fully playable offline, requires no account, contains no loot boxes, and never sells competitive advantages. Rewarded ads are optional. Premium is a one-time purchase, not a subscription.
+Don’t Tap Yet! is fully playable offline, requires no account, contains no loot boxes, and never sells competitive advantages. Rewarded ads are optional. Premium is a one-time purchase, not a subscription.
 
 Game Center features require an internet connection and Apple configuration. Some optional purchases and advertising features may not be available in every region.
 
@@ -41,17 +41,17 @@ timing,reflex,one tap,arcade,casual,reaction,precision,neon,combo,daily challeng
 
 ## What's New — Version 1.0
 
-Welcome to Perfect Timing. Master six modes, eight timing challenges, daily rewards, missions, achievements, Game Center leaderboards, and dozens of neon cosmetics.
+Welcome to Don’t Tap Yet! Master six modes, eight timing challenges, daily rewards, missions, achievements, Game Center leaderboards, and dozens of neon cosmetics.
 
 ## URLs
 
 - Support: https://whox.ai/support (TODO: confirm published route)
-- Marketing: https://whox.ai/perfect-timing (TODO: publish)
-- Privacy: https://whox.ai/perfect-timing/privacy (TODO: publish)
+- Marketing: https://whox.ai/dont-tap-yet (TODO: publish)
+- Privacy: https://whox.ai/dont-tap-yet/privacy (TODO: publish)
 
 ## In-App Purchase descriptions
 
-- **Perfect Timing Premium:** One-time upgrade that removes interstitial ads and permanently unlocks an exclusive theme, marker, trail, badge, and a one-time Timing Coin bonus.
+- **Don’t Tap Yet! Premium:** One-time upgrade that removes interstitial ads and permanently unlocks an exclusive theme, marker, trail, badge, and a one-time Timing Coin bonus.
 - **Cosmetic Bundle One:** Permanently unlocks a curated cosmetic collection.
 - **Small Coin Pack:** 1,000 Timing Coins for cosmetic items.
 - **Medium Coin Pack:** 3,500 Timing Coins for cosmetic items.

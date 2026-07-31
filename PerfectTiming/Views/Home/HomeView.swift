@@ -25,8 +25,8 @@ struct HomeView: View {
             StatPill(icon: "circle.hexagongrid.fill", value: app.save.economy.balance.formatted())
           }.foregroundStyle(.white)
           VStack(spacing: 5) {
-            Text("PERFECT").font(.system(size: 44, weight: .black, design: .rounded))
-            Text("TIMING").font(.system(size: 44, weight: .black, design: .rounded))
+            Text("DON’T").font(.system(size: 44, weight: .black, design: .rounded))
+            Text("TAP YET!").font(.system(size: 44, weight: .black, design: .rounded))
               .foregroundStyle(.cyan)
           }.padding(.vertical, 22)
           Button("PLAY") { app.start(.classic) }.buttonStyle(PrimaryButtonStyle())

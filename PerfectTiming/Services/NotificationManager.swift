@@ -18,7 +18,7 @@ import UserNotifications
     let reminders: [(String, Int, String, String)] = [
       (
         "daily.challenge", 18, "Your daily timing challenge is ready",
-        "Set today’s score in Perfect Timing."
+        "Set today’s score in Don’t Tap Yet!"
       ),
       (
         "daily.reward", 12, "Timing Coins are waiting", "Claim today’s reward and keep your streak."

@@ -1,4 +1,4 @@
-# Perfect Timing Architecture
+# Don’t Tap Yet! Architecture
 
 ## Runtime layers
 

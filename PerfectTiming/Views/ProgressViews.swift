@@ -182,7 +182,7 @@ struct LeaderboardsView: View {
         Image(systemName: "crown.fill").font(.system(size: 70)).foregroundStyle(.yellow)
         Text(app.gameCenter.authenticated ? "Game Center Connected" : "Game Center Offline").font(
           .title.bold())
-        Text("Perfect Timing remains fully playable offline.").foregroundStyle(.secondary)
+        Text("Don’t Tap Yet! remains fully playable offline.").foregroundStyle(.secondary)
         Button("Open Game Center") { app.gameCenter.showDashboard() }.buttonStyle(
           PrimaryButtonStyle()
         ).disabled(!app.gameCenter.authenticated)

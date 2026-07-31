@@ -9,5 +9,5 @@ swift test
 python3 -m json.tool PerfectTiming/Resources/Localizable.xcstrings >/dev/null
 python3 -m json.tool PerfectTiming/Resources/PerfectTiming.storekit >/dev/null
 plutil -lint PerfectTiming/Resources/Info.plist PerfectTiming/Resources/PerfectTiming.entitlements PerfectTiming/Resources/PrivacyInfo.xcprivacy
-printf 'Perfect Timing portable verification passed.
+printf 'Don’t Tap Yet! portable verification passed.
 '

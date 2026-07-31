@@ -54,12 +54,12 @@ struct LaunchView: View {
       NeonBackground()
       VStack(spacing: 22) {
         TargetLogo().scaleEffect(pulse ? 1.08 : 0.9)
-        Text("Perfect Timing").font(.largeTitle.weight(.black))
+        Text("Don’t Tap Yet!").font(.largeTitle.weight(.black))
         ProgressView().tint(.cyan)
       }.onAppear {
         withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) { pulse = true }
       }
-    }.accessibilityElement(children: .combine).accessibilityLabel("Perfect Timing loading")
+    }.accessibilityElement(children: .combine).accessibilityLabel("Don’t Tap Yet! loading")
   }
 }
 

@@ -80,7 +80,13 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_API_ISSUER_ID }}
           ASC_KEY_BASE64: ${{ secrets.APPSTORE_CONNECT_API_KEY_BASE64 }}
         run: |
+          set -euo pipefail
           mkdir -p "$HOME/.appstoreconnect/private_keys"
           echo -n "$ASC_KEY_BASE64" | base64 --decode > "$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+          UPLOAD_LOG="$RUNNER_TEMP/app-store-upload.log"
           xcrun altool --upload-app -f "$RUNNER_TEMP/export/Perfect Timing.ipa" \
-            -t ios --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+            -t ios --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID" 2>&1 | tee "$UPLOAD_LOG"
+          if grep -q 'UPLOAD FAILED' "$UPLOAD_LOG" || ! grep -q 'UPLOAD SUCCEEDED' "$UPLOAD_LOG"; then
+            echo 'App Store Connect did not confirm a successful upload.' >&2
+            exit 1
+          fi

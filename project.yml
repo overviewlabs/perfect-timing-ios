@@ -31,8 +31,10 @@ targets:
       - PerfectTiming/Models
       - PerfectTiming/Services
       - PerfectTiming/Views
-    resources:
-      - PerfectTiming/Resources
+      - path: PerfectTiming/Resources
+        excludes:
+          - Info.plist
+          - PerfectTiming.entitlements
     dependencies:
       - target: PerfectTimingCore
     settings:

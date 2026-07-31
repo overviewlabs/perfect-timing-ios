@@ -48,7 +48,7 @@ import SwiftUI
       .rootViewController?.present(vc, animated: true)
   }
 }
-final class GameCenterDismissDelegate: NSObject, @MainActor GKGameCenterControllerDelegate {
+final class GameCenterDismissDelegate: NSObject, @preconcurrency GKGameCenterControllerDelegate {
   @MainActor static let shared = GameCenterDismissDelegate()
   @MainActor func gameCenterViewControllerDidFinish(
     _ gameCenterViewController: GKGameCenterViewController

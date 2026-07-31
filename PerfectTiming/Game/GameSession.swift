@@ -73,11 +73,6 @@ final class GameSession: ObservableObject {
     countdown()
   }
 
-  isolated deinit {
-    timer?.invalidate()
-    countdownTask?.cancel()
-  }
-
   var canUseFreeRevive: Bool { !revive.used && freeRevivesAvailable > 0 }
   var canUseRewardedRevive: Bool { !revive.used && ads.rewardedAvailable }
   var rewardCoins: Int { competitive ? max(10, score / 350) : 0 }
@@ -284,7 +279,11 @@ final class GameSession: ObservableObject {
     completeIfNeeded()
   }
 
-  func finish() { completeIfNeeded() }
+  func finish() {
+    timer?.invalidate()
+    countdownTask?.cancel()
+    completeIfNeeded()
+  }
 
   private func completeIfNeeded() {
     guard !resultCommitted else { return }

@@ -1,0 +1,14 @@
+{
+  "identifier" : "9E15491F-5FF8-4B6F-B643-3B7B509B34DA",
+  "nonRenewingSubscriptions" : [],
+  "products" : [
+    {"displayPrice":"4.99","familyShareable":false,"internalID":"premium","localizations":[{"description":"Removes interstitial ads and unlocks premium cosmetics plus a one-time coin bonus.","displayName":"Perfect Timing Premium","locale":"en_US"}],"productID":"com.yourcompany.perfecttiming.premium","referenceName":"Perfect Timing Premium","type":"NonConsumable"},
+    {"displayPrice":"2.99","familyShareable":false,"internalID":"bundle1","localizations":[{"description":"A permanent premium cosmetic collection.","displayName":"Cosmetic Bundle One","locale":"en_US"}],"productID":"com.yourcompany.perfecttiming.cosmeticbundle1","referenceName":"Cosmetic Bundle One","type":"NonConsumable"},
+    {"displayPrice":"0.99","familyShareable":false,"internalID":"small","localizations":[{"description":"1,000 Timing Coins for cosmetic unlocks.","displayName":"Small Coin Pack","locale":"en_US"}],"productID":"com.yourcompany.perfecttiming.coins.small","referenceName":"Small Coin Pack","type":"Consumable"},
+    {"displayPrice":"2.99","familyShareable":false,"internalID":"medium","localizations":[{"description":"3,500 Timing Coins for cosmetic unlocks.","displayName":"Medium Coin Pack","locale":"en_US"}],"productID":"com.yourcompany.perfecttiming.coins.medium","referenceName":"Medium Coin Pack","type":"Consumable"},
+    {"displayPrice":"5.99","familyShareable":false,"internalID":"large","localizations":[{"description":"8,000 Timing Coins for cosmetic unlocks.","displayName":"Large Coin Pack","locale":"en_US"}],"productID":"com.yourcompany.perfecttiming.coins.large","referenceName":"Large Coin Pack","type":"Consumable"}
+  ],
+  "settings" : {"_failTransactionsEnabled":false,"_locale":"en_US","_storefront":"USA"},
+  "subscriptionGroups" : [],
+  "version" : {"major":3,"minor":0}
+}
